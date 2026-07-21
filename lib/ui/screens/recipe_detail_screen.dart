@@ -45,7 +45,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               IconButton(
                 tooltip: 'Düzenle',
                 icon: const Icon(Icons.edit),
-                onPressed: null,
+                onPressed: () => context.push('/add-recipe', extra: recipe),
               ),
               IconButton(
                 tooltip: 'Sil',

@@ -68,6 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               IconButton(
+                tooltip: 'İstatistikler',
+                icon: const Icon(Icons.insights),
+                onPressed: () => context.push('/statistics'),
+              ),
+              IconButton(
                 tooltip: 'Dışa aktar',
                 icon: const Icon(Icons.download),
                 onPressed: () => _exportRecipes(context),

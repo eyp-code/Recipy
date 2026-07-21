@@ -7,6 +7,7 @@ import '../data/repositories/recipe_repository.dart';
 class RecipeViewModel extends ChangeNotifier {
   final RecipeRepository _repository;
 
+  List<Recipe> _allRecipes = <Recipe>[];
   List<Recipe> _recipes = <Recipe>[];
   Recipe? _randomRecipe;
   String _selectedCategory = 'Tümü';
@@ -22,7 +23,36 @@ class RecipeViewModel extends ChangeNotifier {
 
   RecipeSortOption get sortOption => _sortOption;
 
+  int get totalRecipeCount => _allRecipes.length;
+
+  Recipe? get highestRatedRecipe {
+    if (_allRecipes.isEmpty) {
+      return null;
+    }
+
+    final List<Recipe> sortedRecipes = List<Recipe>.of(_allRecipes)
+      ..sort((Recipe first, Recipe second) {
+        return second.rating.compareTo(first.rating);
+      });
+
+    return sortedRecipes.first;
+  }
+
+  double get averageRating {
+    if (_allRecipes.isEmpty) {
+      return 0;
+    }
+
+    final double totalRating = _allRecipes.fold<double>(
+      0,
+      (double total, Recipe recipe) => total + recipe.rating,
+    );
+
+    return totalRating / _allRecipes.length;
+  }
+
   void loadRecipes() {
+    _allRecipes = _repository.getAllRecipes();
     _recipes = _repository.getRecipes(
       category: _selectedCategory,
       sortOption: _sortOption,

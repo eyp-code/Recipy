@@ -6,7 +6,9 @@ import '../../main.dart';
 import '../../viewmodels/recipe_viewmodel.dart';
 
 class AddRecipeScreen extends StatefulWidget {
-  const AddRecipeScreen({super.key});
+  const AddRecipeScreen({this.initialRecipe, super.key});
+
+  final Recipe? initialRecipe;
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -43,6 +45,34 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   bool _isFavorite = false;
   bool _submitted = false;
 
+  bool get _isEditing => widget.initialRecipe != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final Recipe? recipe = widget.initialRecipe;
+
+    if (recipe == null) {
+      return;
+    }
+
+    _titleController.text = recipe.title;
+    _prepTimeController.text = recipe.prepTimeInMinutes.toString();
+    _servingSizeController.text = recipe.servingSize.toString();
+    _category = _categories.contains(recipe.category)
+        ? recipe.category
+        : _categories.first;
+    _difficulty = _difficulties.contains(recipe.difficulty)
+        ? recipe.difficulty
+        : _difficulties.first;
+    _rating = recipe.rating;
+    _isFavorite = recipe.isFavorite;
+
+    _replaceControllers(_ingredientControllers, recipe.ingredients);
+    _replaceControllers(_stepControllers, recipe.steps);
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -64,7 +94,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tarif Ekle'),
+        title: Text(_isEditing ? 'Tarifi Düzenle' : 'Tarif Ekle'),
         actions: <Widget>[
           TextButton(onPressed: _saveRecipe, child: const Text('Kaydet')),
         ],
@@ -337,12 +367,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
 
     final DateTime now = DateTime.now();
+    final Recipe? initialRecipe = widget.initialRecipe;
     final Recipe recipe = Recipe(
-      id: now.millisecondsSinceEpoch.toString(),
+      id: initialRecipe?.id ?? now.millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       ingredients: ingredients,
       rating: _rating,
-      createdAt: now,
+      createdAt: initialRecipe?.createdAt ?? now,
       category: _category,
       prepTimeInMinutes: int.parse(_prepTimeController.text.trim()),
       servingSize: int.parse(_servingSizeController.text.trim()),
@@ -352,7 +383,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
 
     final RecipeViewModel viewModel = RecipeViewModelScope.of(context);
-    await viewModel.addRecipe(recipe);
+    if (_isEditing) {
+      await viewModel.updateRecipe(recipe);
+    } else {
+      await viewModel.addRecipe(recipe);
+    }
     viewModel.generateRandomRecipe();
 
     if (!mounted) {
@@ -360,6 +395,23 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
 
     context.pop();
+  }
+
+  void _replaceControllers(
+    List<TextEditingController> controllers,
+    List<String> values,
+  ) {
+    for (final TextEditingController controller in controllers) {
+      controller.dispose();
+    }
+
+    controllers
+      ..clear()
+      ..addAll(
+        (values.isEmpty ? <String>[''] : values).map(
+          (String value) => TextEditingController(text: value),
+        ),
+      );
   }
 }
 
