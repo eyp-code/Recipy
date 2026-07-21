@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../ui/screens/add_recipe_screen.dart';
 import '../ui/screens/home_screen.dart';
 
 final GoRouter router = GoRouter(
@@ -14,7 +15,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/add-recipe',
       builder: (BuildContext context, GoRouterState state) {
-        return const Scaffold(body: Center(child: Text('Tarif Ekle')));
+        return const AddRecipeScreen();
       },
     ),
     GoRoute(
