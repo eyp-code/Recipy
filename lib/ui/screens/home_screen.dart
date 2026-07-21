@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/recipe_sort_option.dart';
 import '../../data/models/recipe.dart';
 import '../../main.dart';
 import '../../viewmodels/recipe_viewmodel.dart';
@@ -44,6 +45,28 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             title: const Text('Tariflerim'),
             actions: <Widget>[
+              PopupMenuButton<RecipeSortOption>(
+                tooltip: 'Sırala',
+                icon: const Icon(Icons.sort),
+                initialValue: viewModel.sortOption,
+                onSelected: viewModel.changeSortOption,
+                itemBuilder: (BuildContext context) {
+                  return const <PopupMenuEntry<RecipeSortOption>>[
+                    PopupMenuItem<RecipeSortOption>(
+                      value: RecipeSortOption.rating,
+                      child: Text('Puan'),
+                    ),
+                    PopupMenuItem<RecipeSortOption>(
+                      value: RecipeSortOption.newest,
+                      child: Text('Yeni'),
+                    ),
+                    PopupMenuItem<RecipeSortOption>(
+                      value: RecipeSortOption.alphabetical,
+                      child: Text('A-Z'),
+                    ),
+                  ];
+                },
+              ),
               IconButton(
                 tooltip: 'Dışa aktar',
                 icon: const Icon(Icons.download),
@@ -62,6 +85,11 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _RandomRecipeCard(recipe: viewModel.randomRecipe),
+                const SizedBox(height: 24),
+                _CategoryFilter(
+                  selectedCategory: viewModel.selectedCategory,
+                  onSelected: viewModel.selectCategory,
+                ),
                 const SizedBox(height: 24),
                 Text(
                   'Tüm Tarifler',
@@ -111,6 +139,44 @@ class _HomeScreenState extends State<HomeScreen> {
     viewModel
       ..loadRecipes()
       ..generateRandomRecipe();
+  }
+}
+
+class _CategoryFilter extends StatelessWidget {
+  const _CategoryFilter({
+    required this.selectedCategory,
+    required this.onSelected,
+  });
+
+  static const List<String> _categories = <String>[
+    'Tümü',
+    'Tavuk',
+    'Makarna',
+    'Tatlı',
+    'Çorba',
+    'Vejetaryen',
+  ];
+
+  final String selectedCategory;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: _categories.map((String category) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(category),
+              selected: selectedCategory == category,
+              onSelected: (_) => onSelected(category),
+            ),
+          );
+        }).toList(growable: false),
+      ),
+    );
   }
 }
 

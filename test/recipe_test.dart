@@ -9,9 +9,13 @@ void main() {
         id: 'recipe-1',
         title: 'Mercimek Çorbası',
         ingredients: <String>['Mercimek', 'Soğan', 'Havuç'],
-        instructions: 'Malzemeleri pişir ve blenderdan geçir.',
         rating: 4.5,
         createdAt: createdAt,
+        category: 'Çorba',
+        prepTimeInMinutes: 25,
+        servingSize: 4,
+        difficulty: 'Kolay',
+        steps: <String>['Malzemeleri pişir.', 'Blenderdan geçir.'],
       );
 
       final Map<String, dynamic> json = recipe.toJson();
@@ -19,9 +23,14 @@ void main() {
       expect(json['id'], 'recipe-1');
       expect(json['title'], 'Mercimek Çorbası');
       expect(json['ingredients'], <String>['Mercimek', 'Soğan', 'Havuç']);
-      expect(json['instructions'], 'Malzemeleri pişir ve blenderdan geçir.');
       expect(json['rating'], 4.5);
       expect(json['created_at'], createdAt.toIso8601String());
+      expect(json['category'], 'Çorba');
+      expect(json['prep_time_in_minutes'], 25);
+      expect(json['serving_size'], 4);
+      expect(json['difficulty'], 'Kolay');
+      expect(json['is_favorite'], false);
+      expect(json['steps'], <String>['Malzemeleri pişir.', 'Blenderdan geçir.']);
     });
 
     test('fromJson should create recipe from snake case json', () {
@@ -29,9 +38,14 @@ void main() {
         'id': 'recipe-2',
         'title': 'Menemen',
         'ingredients': <String>['Yumurta', 'Domates', 'Biber'],
-        'instructions': 'Sebzeleri kavur, yumurtayı ekle.',
         'rating': 5,
         'created_at': '2026-07-21T11:15:00.000',
+        'category': 'Tavuk',
+        'prep_time_in_minutes': 15,
+        'serving_size': 2,
+        'difficulty': 'Kolay',
+        'is_favorite': true,
+        'steps': <String>['Sebzeleri kavur.', 'Yumurtayı ekle.'],
       };
 
       final Recipe recipe = Recipe.fromJson(json);
@@ -39,9 +53,14 @@ void main() {
       expect(recipe.id, 'recipe-2');
       expect(recipe.title, 'Menemen');
       expect(recipe.ingredients, <String>['Yumurta', 'Domates', 'Biber']);
-      expect(recipe.instructions, 'Sebzeleri kavur, yumurtayı ekle.');
       expect(recipe.rating, 5.0);
       expect(recipe.createdAt, DateTime.parse('2026-07-21T11:15:00.000'));
+      expect(recipe.category, 'Tavuk');
+      expect(recipe.prepTimeInMinutes, 15);
+      expect(recipe.servingSize, 2);
+      expect(recipe.difficulty, 'Kolay');
+      expect(recipe.isFavorite, true);
+      expect(recipe.steps, <String>['Sebzeleri kavur.', 'Yumurtayı ekle.']);
     });
   });
 }

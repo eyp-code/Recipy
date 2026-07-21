@@ -203,9 +203,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       id: now.millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       ingredients: ingredients,
-      instructions: _instructionsController.text.trim(),
       rating: _rating,
       createdAt: now,
+      category: 'Tümü',
+      prepTimeInMinutes: 0,
+      servingSize: 1,
+      difficulty: 'Kolay',
+      steps: _instructionSteps(),
     );
 
     final RecipeViewModel viewModel = RecipeViewModelScope.of(context);
@@ -217,5 +221,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
 
     context.pop();
+  }
+
+  List<String> _instructionSteps() {
+    return _instructionsController.text
+        .split('\n')
+        .map((String step) => step.trim())
+        .where((String step) => step.isNotEmpty)
+        .toList(growable: false);
   }
 }

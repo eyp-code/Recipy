@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../core/recipe_sort_option.dart';
 import '../data/models/recipe.dart';
 import '../data/repositories/recipe_repository.dart';
 
@@ -8,6 +9,8 @@ class RecipeViewModel extends ChangeNotifier {
 
   List<Recipe> _recipes = <Recipe>[];
   Recipe? _randomRecipe;
+  String _selectedCategory = 'Tümü';
+  RecipeSortOption _sortOption = RecipeSortOption.newest;
 
   RecipeViewModel(this._repository);
 
@@ -15,9 +18,26 @@ class RecipeViewModel extends ChangeNotifier {
 
   Recipe? get randomRecipe => _randomRecipe;
 
+  String get selectedCategory => _selectedCategory;
+
+  RecipeSortOption get sortOption => _sortOption;
+
   void loadRecipes() {
-    _recipes = _repository.getAllRecipes();
+    _recipes = _repository.getRecipes(
+      category: _selectedCategory,
+      sortOption: _sortOption,
+    );
     notifyListeners();
+  }
+
+  void selectCategory(String category) {
+    _selectedCategory = category;
+    loadRecipes();
+  }
+
+  void changeSortOption(RecipeSortOption sortOption) {
+    _sortOption = sortOption;
+    loadRecipes();
   }
 
   void generateRandomRecipe() {

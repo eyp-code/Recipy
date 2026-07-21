@@ -64,7 +64,9 @@ class RecipeDetailScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(18),
                     child: Text(
-                      recipe.instructions,
+                      recipe.steps.isEmpty
+                          ? 'Hazırlanış adımı eklenmedi.'
+                          : recipe.steps.join('\n\n'),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             height: 1.55,
                           ),
