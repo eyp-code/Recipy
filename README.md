@@ -92,27 +92,6 @@ lib/
 └── viewmodels/
 ```
 
-## Sürüm Notları
-
-APK yayınlamak için GitHub üzerinde yeni bir sürüm oluşturun ve üretilen APK dosyasını sürüm dosyalarına ekleyin.
-
-Örnek sürüm başlığı:
-
-```text
-Recipy v1.0.0
-```
-
-Kısa ve anlaşılır bir değişiklik günlüğü eklemek, kullanıcıların yeni sürümde yapılan değişiklikleri görmesini kolaylaştırır.
-
-Örnek:
-
-```text
-- İlk kararlı sürüm yayınlandı.
-- Tarif ekleme ve düzenleme desteği eklendi.
-- Kategori filtreleme ve sıralama seçenekleri eklendi.
-- JSON yedekleme ve geri yükleme desteği eklendi.
-- İstatistik ekranı ve onboarding akışı eklendi.
-```
 
 ## Lisans
 
