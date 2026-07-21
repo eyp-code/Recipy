@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../ui/screens/add_recipe_screen.dart';
 import '../ui/screens/home_screen.dart';
+import '../ui/screens/recipe_detail_screen.dart';
 
 final GoRouter router = GoRouter(
   routes: <RouteBase>[
@@ -21,7 +22,9 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/recipe/:id',
       builder: (BuildContext context, GoRouterState state) {
-        return const Scaffold(body: Center(child: Text('Tarif Detay')));
+        return RecipeDetailScreen(
+          recipeId: state.pathParameters['id'] ?? '',
+        );
       },
     ),
   ],
