@@ -45,49 +45,22 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             title: const Text('Tariflerim'),
             actions: <Widget>[
-              PopupMenuButton<RecipeSortOption>(
-                tooltip: 'Sırala',
-                icon: const Icon(Icons.sort),
-                initialValue: viewModel.sortOption,
-                onSelected: viewModel.changeSortOption,
-                itemBuilder: (BuildContext context) {
-                  return const <PopupMenuEntry<RecipeSortOption>>[
-                    PopupMenuItem<RecipeSortOption>(
-                      value: RecipeSortOption.rating,
-                      child: Text('Puan'),
-                    ),
-                    PopupMenuItem<RecipeSortOption>(
-                      value: RecipeSortOption.newest,
-                      child: Text('Yeni'),
-                    ),
-                    PopupMenuItem<RecipeSortOption>(
-                      value: RecipeSortOption.alphabetical,
-                      child: Text('A-Z'),
-                    ),
-                  ];
-                },
-              ),
-              IconButton(
-                tooltip: 'İstatistikler',
-                icon: const Icon(Icons.insights),
-                onPressed: () => context.push('/statistics'),
-              ),
-              IconButton(
-                tooltip: 'Dışa aktar',
-                icon: const Icon(Icons.download),
-                onPressed: () => _exportRecipes(context),
-              ),
-              IconButton(
-                tooltip: 'İçe aktar',
-                icon: const Icon(Icons.upload),
-                onPressed: () => _importRecipes(context, viewModel),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(end: 12),
+                child: _AppBarActions(
+                  sortOption: viewModel.sortOption,
+                  onSortSelected: viewModel.changeSortOption,
+                  onStatisticsPressed: () => context.push('/statistics'),
+                  onExportPressed: () => _exportRecipes(context),
+                  onImportPressed: () => _importRecipes(context, viewModel),
+                ),
               ),
             ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _RandomRecipeCard(recipe: viewModel.randomRecipe),
                 const SizedBox(height: 24),
@@ -101,9 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
-                Expanded(
-                  child: _RecipeList(recipes: viewModel.recipes),
-                ),
+                Expanded(child: _RecipeList(recipes: viewModel.recipes)),
               ],
             ),
           ),
@@ -147,6 +118,100 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class _AppBarActions extends StatelessWidget {
+  const _AppBarActions({
+    required this.sortOption,
+    required this.onSortSelected,
+    required this.onStatisticsPressed,
+    required this.onExportPressed,
+    required this.onImportPressed,
+  });
+
+  final RecipeSortOption sortOption;
+  final ValueChanged<RecipeSortOption> onSortSelected;
+  final VoidCallback onStatisticsPressed;
+  final VoidCallback onExportPressed;
+  final VoidCallback onImportPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: kToolbarHeight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          PopupMenuButton<RecipeSortOption>(
+            tooltip: 'Sırala',
+            icon: const Icon(Icons.sort, size: 22),
+            initialValue: sortOption,
+            constraints: const BoxConstraints(minWidth: 42, minHeight: 42),
+            padding: EdgeInsets.zero,
+            onSelected: onSortSelected,
+            itemBuilder: (BuildContext context) {
+              return const <PopupMenuEntry<RecipeSortOption>>[
+                PopupMenuItem<RecipeSortOption>(
+                  value: RecipeSortOption.rating,
+                  child: Text('Puan'),
+                ),
+                PopupMenuItem<RecipeSortOption>(
+                  value: RecipeSortOption.newest,
+                  child: Text('Yeni'),
+                ),
+                PopupMenuItem<RecipeSortOption>(
+                  value: RecipeSortOption.alphabetical,
+                  child: Text('A-Z'),
+                ),
+              ];
+            },
+          ),
+          _ToolbarIconButton(
+            tooltip: 'İstatistikler',
+            icon: Icons.insights,
+            onPressed: onStatisticsPressed,
+          ),
+          _ToolbarIconButton(
+            tooltip: 'Dışa aktar',
+            icon: Icons.download,
+            onPressed: onExportPressed,
+          ),
+          _ToolbarIconButton(
+            tooltip: 'İçe aktar',
+            icon: Icons.upload,
+            onPressed: onImportPressed,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToolbarIconButton extends StatelessWidget {
+  const _ToolbarIconButton({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 2),
+      child: IconButton(
+        tooltip: tooltip,
+        icon: Icon(icon, size: 22),
+        constraints: const BoxConstraints.tightFor(width: 42, height: 42),
+        padding: EdgeInsets.zero,
+        visualDensity: VisualDensity.compact,
+        onPressed: onPressed,
+      ),
+    );
+  }
+}
+
 class _CategoryFilter extends StatelessWidget {
   const _CategoryFilter({
     required this.selectedCategory,
@@ -169,17 +234,23 @@ class _CategoryFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        children: _categories.map((String category) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(category),
-              selected: selectedCategory == category,
-              onSelected: (_) => onSelected(category),
-            ),
-          );
-        }).toList(growable: false),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.sizeOf(context).width - 32,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: _categories.map((String category) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: ChoiceChip(
+                label: Text(category),
+                selected: selectedCategory == category,
+                onSelected: (_) => onSelected(category),
+              ),
+            );
+          }).toList(growable: false),
+        ),
       ),
     );
   }
@@ -209,30 +280,33 @@ class _RandomRecipeCard extends StatelessWidget {
       );
     }
 
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => context.push('/recipe/${currentRecipe.id}'),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Bugün bunu mu yapsan?',
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                currentRecipe.title,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '⭐ ${currentRecipe.rating.toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ],
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => context.push('/recipe/${currentRecipe.id}'),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Bugün bunu mu yapsan?',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  currentRecipe.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '⭐ ${currentRecipe.rating.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -96,7 +96,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       appBar: AppBar(
         title: Text(_isEditing ? 'Tarifi Düzenle' : 'Tarif Ekle'),
         actions: <Widget>[
-          TextButton(onPressed: _saveRecipe, child: const Text('Kaydet')),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 8),
+            child: TextButton(onPressed: _saveRecipe, child: const Text('Kaydet')),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -118,7 +121,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               DropdownButtonFormField<String>(
                 value: _category,
                 decoration: const InputDecoration(labelText: 'Kategori'),
@@ -138,49 +141,60 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 22),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
-                    child: TextFormField(
-                      controller: _prepTimeController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Hazırlanma Süresi',
-                        suffixText: 'dk',
+                    child: _LabeledField(
+                      label: 'Hazırlanma Süresi',
+                      child: TextFormField(
+                        controller: _prepTimeController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: '25',
+                          suffixText: 'dk',
+                        ),
+                        validator: _positiveIntegerValidator,
                       ),
-                      validator: _positiveIntegerValidator,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TextFormField(
-                      controller: _servingSizeController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Porsiyon',
-                        suffixText: 'kişi',
+                    child: _LabeledField(
+                      label: 'Porsiyon',
+                      child: TextFormField(
+                        controller: _servingSizeController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: '2',
+                          suffixText: 'kişi',
+                        ),
+                        validator: _positiveIntegerValidator,
                       ),
-                      validator: _positiveIntegerValidator,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Text('Zorluk', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: _difficulties.map((String difficulty) {
-                  return ChoiceChip(
-                    label: Text(difficulty),
-                    selected: _difficulty == difficulty,
-                    selectedColor: _difficultyColor(context, difficulty),
-                    onSelected: (_) {
-                      setState(() {
-                        _difficulty = difficulty;
-                      });
-                    },
+                  return SizedBox(
+                    width: _difficultyChipWidth(context),
+                    child: ChoiceChip(
+                      label: Center(child: Text(difficulty)),
+                      selected: _difficulty == difficulty,
+                      selectedColor: _difficultyColor(context, difficulty),
+                      onSelected: (_) {
+                        setState(() {
+                          _difficulty = difficulty;
+                        });
+                      },
+                    ),
                   );
                 }).toList(growable: false),
               ),
@@ -353,6 +367,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
   }
 
+  double _difficultyChipWidth(BuildContext context) {
+    final double availableWidth = MediaQuery.sizeOf(context).width - 32;
+
+    return (availableWidth - 16) / 3;
+  }
+
   Future<void> _saveRecipe() async {
     setState(() {
       _submitted = true;
@@ -455,6 +475,27 @@ class _DynamicTextRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
+          child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        ),
+        child,
+      ],
     );
   }
 }
