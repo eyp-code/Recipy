@@ -84,16 +84,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _exportRecipes(BuildContext context) async {
-    await RecipeViewModelScope.exportImportServiceOf(context).exportRecipes();
+    final exportImportService = RecipeViewModelScope.exportImportServiceOf(
+      context,
+    );
+
+    await exportImportService.exportRecipes();
   }
 
   Future<void> _importRecipes(
     BuildContext context,
     RecipeViewModel viewModel,
   ) async {
-    final bool imported = await RecipeViewModelScope.exportImportServiceOf(
+    final exportImportService = RecipeViewModelScope.exportImportServiceOf(
       context,
-    ).importRecipes();
+    );
+    final bool imported = await exportImportService.importRecipes();
+
+    if (!mounted) {
+      return;
+    }
 
     if (!imported) {
       return;
