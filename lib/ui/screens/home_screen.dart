@@ -69,18 +69,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   onSelected: viewModel.selectCategory,
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  'Tüm Tarifler',
-                  style: Theme.of(context).textTheme.titleLarge,
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        'Tüm Tarifler',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => context.push('/add-recipe'),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Tarif Ekle'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Expanded(child: _RecipeList(recipes: viewModel.recipes)),
               ],
             ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => context.push('/add-recipe'),
-            child: const Icon(Icons.add),
           ),
         );
       },
